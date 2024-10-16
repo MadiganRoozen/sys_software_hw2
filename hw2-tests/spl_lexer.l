@@ -111,6 +111,29 @@ IGNORED ({BLANK}|{TAB}|{VT}|{FORMFEED}|{EOL}|{COMMENT})
 
  /* fill in the rules for your lexer below! */
 
+//this function returns the message to be input to format error
+char * error_message (char * invalidToken){
+	char * msg = malloc(100);
+	char intMax [11];
+	if(msg == NULL) exit(1);
+	strcpy(msg, "");
+	sprintf(intMax, "%d", INT_MAX);
+	//checks if error is because of a too large integer
+	if(strlen(invalidToken) > 10 || strcmp(invalidToken, intMax) > 0){
+		strcat(msg, "Number (");
+		strcat(msg, invalidToken);
+		strcat(msg, ") is too large!");
+	} else {
+	    char ascii_str[4];
+	    sprintf(ascii_str, "%o", invalidToken);
+		strcat(msg, "invalid character: '");
+		strcat(msg, invalidToken);
+		strcat(msg, "' ('\\0");
+		strcat(msg, ascii_str);
+		strcat(msg, "')");
+	}
+	return msg;
+}
 /* $Id: spl_lexer_user_code.c,v 1.4 2024/10/06 18:43:01 leavens Exp leavens $ */
 
 %%
