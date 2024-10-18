@@ -1,8 +1,8 @@
 /* $Id: spl_lexer_definitions_top.l,v 1.4 2024/10/06 19:16:25 leavens Exp leavens $ */
 /* Lexical Analyzer for SPL */
 
-%option header-file = "spl_lexer.h"
-%option outfile = "spl_lexer.c"
+%option header-file="spl_lexer.h"
+%option outfile="spl_lexer.c"
 %option yylineno
 %option bison-bridge
 
@@ -153,6 +153,7 @@ IGNORED ({BLANK}|{TAB}|{VT}|{FORMFEED}|{EOL}|{COMMENT})
 
 ";"            { return semisym; }          /* ";" = 265 */
 "."            { return periodsym; }        /* "." = 264 */
+"="            { return eqsym; }            /* "=" = 266*/
 ","            { return commasym; }         /* "," = 267 */
 "("            { return lparensym; }        /* "(" = 269 */
 ")"            { return rparensym; }        /* ")" = 270 */
@@ -166,7 +167,7 @@ IGNORED ({BLANK}|{TAB}|{VT}|{FORMFEED}|{EOL}|{COMMENT})
     char buffer[BUFFER_SIZE];
     
     
-    snprintf(buffer, sizeof(buffer),"invalid character: '%c' ('\\%03o')", yytext[0], yytext[0]);
+    snprintf(buffer, sizeof(buffer),"invalid character: '%c' ('\\0%o')", yytext[0], yytext[0]);
     
     yyerror(lexer_filename(), buffer);
     
