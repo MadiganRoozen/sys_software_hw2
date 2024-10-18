@@ -132,6 +132,7 @@ IGNORED ({BLANK}|{TAB}|{VT}|{FORMFEED}|{EOL}|{COMMENT})
 "-"            { return minussym; }         /* "-" = 261 */
 "*"            { return multsym; }          /* "*" = 262 */
 "/"            { return divsym; }           /* "/" = 263 */
+"="            { return eqsym; }            /* "=" = 266
 ":="           { return becomessym; }       /* ":=" = 268 */
 "=="           { return eqeqsym; }          /* "==" = 286 */
 "!="           { return neqsym; }           /* "!=" = 287 */
@@ -147,7 +148,28 @@ IGNORED ({BLANK}|{TAB}|{VT}|{FORMFEED}|{EOL}|{COMMENT})
 
 
 [0-9]+ { 
-    return numbersym;  /* Number symbol = 259 */
+
+    /* Too Large Number Handling */
+
+    int length = strlen(yytext);
+    char* endchar;
+
+
+    if (length <= 10) {
+        long int num = strtol(yytext, &endchar, 10);
+
+        if (num <= INT_MAX)
+            return numbersym;
+
+    }
+
+    char buffer[BUFFER_SIZE];
+
+    snprintf(buffer, sizeof(buffer), "Number (%s) is too large!\n", yytext);
+
+    yyerror(lexer_filename(), buffer);
+
+    return YYerror;  /* Number symbol = 259 */
 }
 
 
