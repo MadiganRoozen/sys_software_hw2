@@ -74,6 +74,8 @@ static void number2ast(unsigned int val)
     yylval = t;
 }
 
+#define BUFFER_SIZE 100
+
 %}
 
  /* you can add actual definitions below, before the %% */
@@ -109,34 +111,75 @@ IGNORED ({BLANK}|{TAB}|{VT}|{FORMFEED}|{EOL}|{COMMENT})
 
 %%
 
- /* fill in the rules for your lexer below! */
 
-//this function returns the message to be input to format error
-char * error_message (char * invalidToken){
-	char * msg = malloc(100);
-	char intMax [11];
-	if(msg == NULL) exit(1);
-	strcpy(msg, "");
-	sprintf(intMax, "%d", INT_MAX);
-	//checks if error is because of a too large integer
-	if(strlen(invalidToken) > 10 || strcmp(invalidToken, intMax) > 0){
-		strcat(msg, "Number (");
-		strcat(msg, invalidToken);
-		strcat(msg, ") is too large!");
-	} else {
-	    char ascii_str[4];
-	    sprintf(ascii_str, "%o", invalidToken);
-		strcat(msg, "invalid character: '");
-		strcat(msg, invalidToken);
-		strcat(msg, "' ('\\0");
-		strcat(msg, ascii_str);
-		strcat(msg, "')");
-	}
-	return msg;
+"const"        { return constsym; }         /* const = 271 */
+"var"          { return varsym; }           /* var = 272 */
+"proc"         { return procsym; }          /* proc = 273 */
+"call"         { return callsym; }          /* call = 274 */
+"begin"        { return beginsym; }         /* begin = 275 */
+"end"          { return endsym; }           /* end = 276 */
+"if"           { return ifsym; }            /* if = 277 */
+"then"         { return thensym; }          /* then = 278 */
+"else"         { return elsesym; }          /* else = 279 */
+"while"        { return whilesym; }         /* while = 280 */
+"do"           { return dosym; }            /* do = 281 */
+"read"         { return readsym; }          /* read = 282 */
+"print"        { return printsym; }         /* print = 283 */
+"divisible"    { return divisiblesym; }     /* divisible = 284 */
+"by"           { return bysym; }            /* by = 285 */
+
+"+"            { return plussym; }          /* "+" = 260 */
+"-"            { return minussym; }         /* "-" = 261 */
+"*"            { return multsym; }          /* "*" = 262 */
+"/"            { return divsym; }           /* "/" = 263 */
+":="           { return becomessym; }       /* ":=" = 268 */
+"=="           { return eqeqsym; }          /* "==" = 286 */
+"!="           { return neqsym; }           /* "!=" = 287 */
+"<"            { return ltsym; }            /* "<" = 288 */
+"<="           { return leqsym; }           /* "<=" = 289 */
+">"            { return gtsym; }            /* ">" = 290 */
+">="           { return geqsym; }           /* ">=" = 291 */
+
+
+[a-zA-Z][a-zA-Z0-9]* {
+    return identsym;  /* Identifier symbol = 258 */
 }
-/* $Id: spl_lexer_user_code.c,v 1.4 2024/10/06 18:43:01 leavens Exp leavens $ */
+
+
+[0-9]+ { 
+    return numbersym;  /* Number symbol = 259 */
+}
+
+
+";"            { return semisym; }          /* ";" = 265 */
+"."            { return periodsym; }        /* "." = 264 */
+","            { return commasym; }         /* "," = 267 */
+"("            { return lparensym; }        /* "(" = 269 */
+")"            { return rparensym; }        /* ")" = 270 */
+
+[ \t\r\n]+          { /* Ignore whitespace */ }
+"%"[^\n]*         { /* Ignore comments starting with % */ }
+
+
+.              {
+    
+    char buffer[BUFFER_SIZE];
+    
+    
+    snprintf(buffer, sizeof(buffer),"invalid character: '%c' ('\\%03o')", yytext[0], yytext[0]);
+    
+    yyerror(lexer_filename(), buffer);
+    
+    return YYerror;  /* Error token = 256 */
+}
+
+
 
 %%
+
+void print_lex_char(char* token) {
+    printf("");
+}
 
  /* This code goes in the user code section of the spl_lexer.l file,
    following the last %% above. */
@@ -209,7 +252,6 @@ void lexer_print_token(enum yytokentype t, unsigned int tline,
     printf("%-6d %-4d \"%s\"\n", t, tline, txt);
 }
 
-
 /* Read all the tokens from the input file
  * and print each token on standard output
  * using the format in lexer_print_token */
@@ -223,6 +265,9 @@ void lexer_output()
 	if (t == YYEOF) {
 	    break;
         }
-        lexer_print_token(t, yylineno, yytext);
+
+        if (t != YYerror)
+            lexer_print_token(t, yylineno, yytext);
+
     } while (t != YYEOF);
 }
