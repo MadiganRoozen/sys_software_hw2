@@ -145,15 +145,12 @@ IGNORED ({BLANK}|{TAB}|{VT}|{FORMFEED}|{EOL}|{COMMENT})
     return identsym;  /* Identifier symbol = 258 */
 }
 
-
 [0-9]* { 
 	char intMax[11];
 	sprintf(intMax, "%d", INT_MAX);
-	if (strlen(yytext) > 10 || strcmp(yytext, intMax) > 0){
-		char buffer[BUFFER_SIZE];
-		snprintf(buffer, sizeof(buffer),"Number (%s) is too large!", yytext);
-		yyerror(lexer_filename(), buffer);
-		return YYerror;  /* Error token = 256 */
+	if (strlen(yytext) > 10){
+        make_error();
+        return numbersym;  /* Number symbol = 259 */
 	}
     return numbersym;  /* Number symbol = 259 */
 }
@@ -236,6 +233,13 @@ void yyerror(const char *filename, const char *msg)
     fflush(stdout);
     fprintf(stderr, "%s:%d: %s\n", input_filename, lexer_line(), msg);
     errors_noted = true;
+}
+
+void make_error(){
+    char buffer[BUFFER_SIZE];
+	snprintf(buffer, sizeof(buffer),"Number (%s) is too large!", yytext);
+	yyerror(lexer_filename(), buffer);
+	return YYerror;  /* Error token = 256 */
 }
 
 // On standard output:

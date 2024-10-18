@@ -394,7 +394,7 @@ struct yy_trans_info
 	};
 static const flex_int16_t yy_accept[89] =
     {   0,
-        0,    0,   39,   37,   35,   35,   37,   36,   33,   34,
+       28,   28,   39,   37,   35,   35,   37,   36,   33,   34,
        18,   16,   32,   17,   30,   19,   28,   37,   29,   23,
        31,   25,   27,   27,   27,   27,   27,   27,   27,   27,
        27,   27,   27,   35,   22,   36,   28,   20,   24,   21,
@@ -1045,55 +1045,61 @@ YY_RULE_SETUP
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 150 "spl_lexer.l"
+#line 149 "spl_lexer.l"
 { 
+	char intMax[11];
+	sprintf(intMax, "%d", INT_MAX);
+	if (strlen(yytext) > 10){
+        make_error();
+        return numbersym;  /* Number symbol = 259 */
+	}
     return numbersym;  /* Number symbol = 259 */
 }
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 155 "spl_lexer.l"
+#line 160 "spl_lexer.l"
 { return semisym; }          /* ";" = 265 */
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 156 "spl_lexer.l"
+#line 161 "spl_lexer.l"
 { return periodsym; }        /* "." = 264 */
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 157 "spl_lexer.l"
+#line 162 "spl_lexer.l"
 { return eqsym; }            /* "=" = 266*/
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 158 "spl_lexer.l"
+#line 163 "spl_lexer.l"
 { return commasym; }         /* "," = 267 */
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 159 "spl_lexer.l"
+#line 164 "spl_lexer.l"
 { return lparensym; }        /* "(" = 269 */
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 160 "spl_lexer.l"
+#line 165 "spl_lexer.l"
 { return rparensym; }        /* ")" = 270 */
 	YY_BREAK
 case 35:
 /* rule 35 can match eol */
 YY_RULE_SETUP
-#line 162 "spl_lexer.l"
+#line 167 "spl_lexer.l"
 { /* Ignore whitespace */ }
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 163 "spl_lexer.l"
+#line 168 "spl_lexer.l"
 { /* Ignore comments starting with % */ }
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 166 "spl_lexer.l"
+#line 171 "spl_lexer.l"
 {
     
     char buffer[BUFFER_SIZE];
@@ -1108,10 +1114,10 @@ YY_RULE_SETUP
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 180 "spl_lexer.l"
+#line 185 "spl_lexer.l"
 ECHO;
 	YY_BREAK
-#line 1115 "spl_lexer.c"
+#line 1121 "spl_lexer.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2128,7 +2134,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 180 "spl_lexer.l"
+#line 185 "spl_lexer.l"
 
 
 void print_lex_char(char* token) {
@@ -2181,6 +2187,13 @@ void yyerror(const char *filename, const char *msg)
     fflush(stdout);
     fprintf(stderr, "%s:%d: %s\n", input_filename, lexer_line(), msg);
     errors_noted = true;
+}
+
+void make_error(){
+    char buffer[BUFFER_SIZE];
+	snprintf(buffer, sizeof(buffer),"Number (%s) is too large!", yytext);
+	yyerror(lexer_filename(), buffer);
+	return YYerror;  /* Error token = 256 */
 }
 
 // On standard output:
