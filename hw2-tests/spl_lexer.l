@@ -132,7 +132,7 @@ IGNORED ({BLANK}|{TAB}|{VT}|{FORMFEED}|{EOL}|{COMMENT})
 "-"            { return minussym; }         /* "-" = 261 */
 "*"            { return multsym; }          /* "*" = 262 */
 "/"            { return divsym; }           /* "/" = 263 */
-"="            { return eqsym; }            /* "=" = 266
+"="            { return eqsym; }            /* "=" = 266 */
 ":="           { return becomessym; }       /* ":=" = 268 */
 "=="           { return eqeqsym; }          /* "==" = 286 */
 "!="           { return neqsym; }           /* "!=" = 287 */
@@ -169,7 +169,7 @@ IGNORED ({BLANK}|{TAB}|{VT}|{FORMFEED}|{EOL}|{COMMENT})
 
     yyerror(lexer_filename(), buffer);
 
-    return YYerror;  /* Number symbol = 259 */
+    return numbersym;  /* Number symbol = 259 */
 }
 
 
@@ -188,7 +188,7 @@ IGNORED ({BLANK}|{TAB}|{VT}|{FORMFEED}|{EOL}|{COMMENT})
     char buffer[BUFFER_SIZE];
     
     
-    snprintf(buffer, sizeof(buffer),"invalid character: '%c' ('\\%03o')", yytext[0], yytext[0]);
+    snprintf(buffer, sizeof(buffer),"invalid character: '%c' ('\\0%o')", yytext[0], yytext[0]);
     
     yyerror(lexer_filename(), buffer);
     
