@@ -146,7 +146,15 @@ IGNORED ({BLANK}|{TAB}|{VT}|{FORMFEED}|{EOL}|{COMMENT})
 }
 
 
-[0-9]+ { 
+[0-9]* { 
+	char intMax[11];
+	sprintf(intMax, "%d", INT_MAX);
+	if (strlen(yytext) > 10 || strcmp(yytext, intMax) > 0){
+		char buffer[BUFFER_SIZE];
+		snprintf(buffer, sizeof(buffer),"Number (%s) is too large!", yytext);
+		yyerror(lexer_filename(), buffer);
+		return YYerror;  /* Error token = 256 */
+	}
     return numbersym;  /* Number symbol = 259 */
 }
 
