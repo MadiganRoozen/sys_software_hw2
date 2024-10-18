@@ -148,7 +148,7 @@ IGNORED ({BLANK}|{TAB}|{VT}|{FORMFEED}|{EOL}|{COMMENT})
 [0-9]* { 
 	char intMax[11];
 	sprintf(intMax, "%d", INT_MAX);
-	if (strlen(yytext) > 10){
+	if (strlen(yytext) > 10 || strcmp(yytext, intMax) > 0){
         make_error();
         return numbersym;  /* Number symbol = 259 */
 	}
